@@ -1,3 +1,4 @@
+// Package handlers exposes handler functions to be used by the Gin router
 package handlers
 
 import (
@@ -7,14 +8,16 @@ import (
 	"net/http"
 )
 
+// The graph data structure to store the words and their synonyms
 var store *graph.Graph
 
 func init() {
 	store = graph.New()
 }
 
+// AddWord adds a new word to the graph. The request may optionally include the word's synonyms - if so, they are also added to the graph.
 func AddWord(c *gin.Context) {
-	request, err := data.UnmarshalJson[data.CreateWordRequest](c.Request.Body)
+	request, err := data.UnmarshalJson[data.WordInfo](c.Request.Body)
 	if err != nil {
 		c.Status(http.StatusBadRequest)
 		return
@@ -34,12 +37,10 @@ func AddWord(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusCreated, data.CreateWordResponse{
-		Word:     request.Word,
-		Synonyms: request.Synonyms,
-	})
+	c.JSON(http.StatusCreated, data.NewWordInfo(request.Word, request.Synonyms))
 }
 
+// AddSynonyms appends one or more synonyms to an existing word
 func AddSynonyms(c *gin.Context) {
 	word := c.Param("word")
 	if word == "" {
@@ -47,7 +48,7 @@ func AddSynonyms(c *gin.Context) {
 		return
 	}
 
-	synonyms, err := data.UnmarshalJson[data.CreateSynonymsRequest](c.Request.Body)
+	synonyms, err := data.UnmarshalJson[data.SynonymsInfo](c.Request.Body)
 	if err != nil {
 		c.Status(http.StatusBadRequest)
 		return
@@ -66,12 +67,10 @@ func AddSynonyms(c *gin.Context) {
 		c.Status(http.StatusInternalServerError)
 		return
 	}
-	c.JSON(http.StatusCreated, data.CreateSynonymsResponse{
-		Word:     word,
-		Synonyms: wordSynonyms,
-	})
+	c.JSON(http.StatusCreated, data.NewWordInfo(word, wordSynonyms))
 }
 
+// GetSynonyms fetches all synonyms for a word
 func GetSynonyms(c *gin.Context) {
 	word := c.Param("word")
 	if word == "" {
@@ -84,11 +83,10 @@ func GetSynonyms(c *gin.Context) {
 		c.Status(http.StatusNotFound)
 		return
 	}
-	c.JSON(http.StatusOK, data.GetSynonymsResponse{
-		Synonyms: synonyms,
-	})
+	c.JSON(http.StatusOK, data.NewSynonymsInfo(synonyms))
 }
 
+// GetWords fetches all words in the graph
 func GetWords(c *gin.Context) {
 	c.JSON(http.StatusOK, store.GetVertexes())
 }
