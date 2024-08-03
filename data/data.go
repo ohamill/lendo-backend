@@ -1,7 +1,7 @@
 package data
 
 type WordInfo struct {
-	Word string `json:"word"`
+	Word string `json:"word" validate:"required"`
 	SynonymsInfo
 }
 
@@ -14,8 +14,18 @@ func NewWordInfo(word string, synonyms []string) WordInfo {
 	}
 }
 
+type WordsInfo struct {
+	Words []string `json:"words"`
+}
+
+func NewWordsInfo(words []string) WordsInfo {
+	return WordsInfo{
+		Words: words,
+	}
+}
+
 type SynonymsInfo struct {
-	Synonyms []string `json:"synonyms"`
+	Synonyms []string `json:"synonyms" validate:"required"`
 }
 
 func NewSynonymsInfo(synonyms []string) SynonymsInfo {
