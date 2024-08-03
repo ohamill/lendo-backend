@@ -8,29 +8,27 @@ import (
 	"net/http"
 )
 
-// The graph data structure to store the words and their synonyms
-var store *graph.Graph
-
-func init() {
-	store = graph.New()
+type Handlers struct {
+	// The graph data structure to store the words and their synonyms
+	Store *graph.Graph
 }
 
 // AddWord adds a new word to the graph. The request may optionally include the word's synonyms - if so, they are also added to the graph.
-func AddWord(c *gin.Context) {
+func (h *Handlers) AddWord(c *gin.Context) {
 	request, err := data.DecodeJson[data.WordInfo](c.Request.Body)
 	if err != nil {
 		c.Status(http.StatusBadRequest)
 		return
 	}
 
-	err = store.AddVertex(request.Word)
+	err = h.Store.AddVertex(request.Word)
 	if err != nil {
 		c.Status(http.StatusConflict)
 		return
 	}
 
 	for _, synonym := range request.Synonyms {
-		err = store.AddEdge(request.Word, synonym)
+		err = h.Store.AddEdge(request.Word, synonym)
 		if err != nil {
 			c.Status(http.StatusBadRequest)
 			return
@@ -41,7 +39,7 @@ func AddWord(c *gin.Context) {
 }
 
 // AddSynonyms appends one or more synonyms to an existing word
-func AddSynonyms(c *gin.Context) {
+func (h *Handlers) AddSynonyms(c *gin.Context) {
 	word := c.Param("word")
 	if word == "" {
 		c.Status(http.StatusBadRequest)
@@ -55,14 +53,14 @@ func AddSynonyms(c *gin.Context) {
 	}
 
 	for _, synonym := range synonyms.Synonyms {
-		err = store.AddEdge(word, synonym)
+		err = h.Store.AddEdge(word, synonym)
 		if err != nil {
 			c.Status(http.StatusBadRequest)
 			return
 		}
 	}
 
-	wordSynonyms, err := store.GetVertexEdges(word)
+	wordSynonyms, err := h.Store.GetVertexEdges(word)
 	if err != nil {
 		c.Status(http.StatusInternalServerError)
 		return
@@ -71,14 +69,14 @@ func AddSynonyms(c *gin.Context) {
 }
 
 // GetSynonyms fetches all synonyms for a word
-func GetSynonyms(c *gin.Context) {
+func (h *Handlers) GetSynonyms(c *gin.Context) {
 	word := c.Param("word")
 	if word == "" {
 		c.Status(http.StatusBadRequest)
 		return
 	}
 
-	synonyms, err := store.GetVertexEdges(word)
+	synonyms, err := h.Store.GetVertexEdges(word)
 	if err != nil {
 		c.Status(http.StatusNotFound)
 		return
@@ -87,6 +85,7 @@ func GetSynonyms(c *gin.Context) {
 }
 
 // GetWords fetches all words in the graph
-func GetWords(c *gin.Context) {
-	c.JSON(http.StatusOK, store.GetVertexes())
+func (h *Handlers) GetWords(c *gin.Context) {
+	vertices := h.Store.GetVertexes()
+	c.JSON(http.StatusOK, data.NewWordsInfo(vertices))
 }
