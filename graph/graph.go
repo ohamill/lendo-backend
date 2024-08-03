@@ -1,3 +1,4 @@
+// Package graph exposes a graph data structure and an API for reading and updating the graph
 package graph
 
 import (
@@ -6,6 +7,7 @@ import (
 )
 
 type Graph struct {
+	// Edges stores mapping from each word to its list of synonyms
 	Edges map[string][]string
 }
 
@@ -15,6 +17,7 @@ func New() *Graph {
 	}
 }
 
+// AddVertex adds a new vertex to the graph and assigns it an empty slice of values. The vertex must not already exist, or this method will return an error.
 func (g *Graph) AddVertex(vertex string) error {
 	if g.exists(vertex) {
 		return fmt.Errorf("vertex %s already exists", vertex)
@@ -25,6 +28,7 @@ func (g *Graph) AddVertex(vertex string) error {
 	return nil
 }
 
+// AddEdge adds a new edge to a vertex. The vertex must already exist, or else an error is returned. The new edge is also added to all existing edges of the vertex.
 func (g *Graph) AddEdge(vertex, edge string) error {
 	if !g.exists(vertex) {
 		return fmt.Errorf("vertex %s does not exist", vertex)
@@ -44,6 +48,7 @@ func (g *Graph) AddEdge(vertex, edge string) error {
 	return nil
 }
 
+// GetVertexEdges returns all edges for the provided vertex. To distinguish between vertices with no edges and non-existent vertices, an error is returned if the provided vertex does not exist in the graph.
 func (g *Graph) GetVertexEdges(vertex string) ([]string, error) {
 	edges, ok := g.Edges[vertex]
 	if !ok {
@@ -52,6 +57,7 @@ func (g *Graph) GetVertexEdges(vertex string) ([]string, error) {
 	return edges, nil
 }
 
+// GetVertexes returns all vertices contained in the graph
 func (g *Graph) GetVertexes() []string {
 	vertexes := make([]string, len(g.Edges))
 

@@ -5,6 +5,7 @@ import (
 	"io"
 )
 
+// UnmarshalJson will convert r's JSON-encoded content into a value of type T
 func UnmarshalJson[T any](r io.Reader) (T, error) {
 	var t T
 	content, err := io.ReadAll(r)
