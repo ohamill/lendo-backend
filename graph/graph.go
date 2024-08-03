@@ -3,6 +3,7 @@ package graph
 
 import (
 	"fmt"
+	"lendo-backend/lendoErrors"
 	"strings"
 )
 
@@ -20,7 +21,7 @@ func New() *Graph {
 // AddVertex adds a new vertex to the graph and assigns it an empty slice of values. The vertex must not already exist, or this method will return an error.
 func (g *Graph) AddVertex(vertex string) error {
 	if g.exists(vertex) {
-		return fmt.Errorf("vertex %s already exists", vertex)
+		return lendoErrors.ErrVertexAlreadyExists
 	}
 
 	g.Edges[vertex] = make([]string, 0)
@@ -31,7 +32,7 @@ func (g *Graph) AddVertex(vertex string) error {
 // AddEdge adds a new edge to a vertex. The vertex must already exist, or else an error is returned. The new edge is also added to all existing edges of the vertex.
 func (g *Graph) AddEdge(vertex, edge string) error {
 	if !g.exists(vertex) {
-		return fmt.Errorf("vertex %s does not exist", vertex)
+		return lendoErrors.ErrVertexDoesNotExist
 	}
 
 	for _, e := range g.Edges[vertex] {
@@ -52,7 +53,7 @@ func (g *Graph) AddEdge(vertex, edge string) error {
 func (g *Graph) GetVertexEdges(vertex string) ([]string, error) {
 	edges, ok := g.Edges[vertex]
 	if !ok {
-		return nil, fmt.Errorf("vertex %s does not exist", vertex)
+		return nil, lendoErrors.ErrVertexDoesNotExist
 	}
 	return edges, nil
 }
