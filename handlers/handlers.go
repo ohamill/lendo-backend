@@ -17,7 +17,7 @@ func init() {
 
 // AddWord adds a new word to the graph. The request may optionally include the word's synonyms - if so, they are also added to the graph.
 func AddWord(c *gin.Context) {
-	request, err := data.UnmarshalJson[data.WordInfo](c.Request.Body)
+	request, err := data.DecodeJson[data.WordInfo](c.Request.Body)
 	if err != nil {
 		c.Status(http.StatusBadRequest)
 		return
@@ -48,7 +48,7 @@ func AddSynonyms(c *gin.Context) {
 		return
 	}
 
-	synonyms, err := data.UnmarshalJson[data.SynonymsInfo](c.Request.Body)
+	synonyms, err := data.DecodeJson[data.SynonymsInfo](c.Request.Body)
 	if err != nil {
 		c.Status(http.StatusBadRequest)
 		return
