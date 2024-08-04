@@ -24,14 +24,14 @@ func TestDecodeJson_WordInfo(t *testing.T) {
 	if wordInfo.Word.Word != "happy" {
 		t.Fatalf("wordInfo.Word expected 'happy', got '%v'\n", wordInfo.Word)
 	}
-	if len(wordInfo.Synonyms) != 2 {
-		t.Fatalf("wordInfo.Synonyms length expected 2, got %v\n", len(wordInfo.Synonyms))
+	if len(wordInfo.Synonyms.Synonyms) != 2 {
+		t.Fatalf("wordInfo.Synonyms length expected 2, got %v\n", len(wordInfo.Synonyms.Synonyms))
 	}
-	if wordInfo.Synonyms[0] != "glad" {
-		t.Fatalf("wordInfo.Synonyms[0] expected 'glad', got '%v'\n", wordInfo.Synonyms[0])
+	if wordInfo.Synonyms.Synonyms[0] != "glad" {
+		t.Fatalf("wordInfo.Synonyms[0] expected 'glad', got '%v'\n", wordInfo.Synonyms.Synonyms[0])
 	}
-	if wordInfo.Synonyms[1] != "joyful" {
-		t.Fatalf("wordInfo.Synonyms[1] expected 'joyful', got '%v'\n", wordInfo.Synonyms[1])
+	if wordInfo.Synonyms.Synonyms[1] != "joyful" {
+		t.Fatalf("wordInfo.Synonyms[1] expected 'joyful', got '%v'\n", wordInfo.Synonyms.Synonyms[1])
 	}
 }
 
