@@ -14,9 +14,8 @@ func Setup(store *graph.Graph) *gin.Engine {
 	env := &handlers.Handlers{Store: store}
 
 	r.POST("/word", env.AddWord)
-	r.POST("/synonyms/:word", env.AddSynonyms)
+	r.POST("/synonym/:word", env.AddSynonym)
 	r.GET("/synonyms/:word", env.GetSynonyms)
-	r.GET("/words", env.GetWords)
 
 	return r
 }

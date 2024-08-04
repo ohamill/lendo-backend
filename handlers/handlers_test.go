@@ -11,70 +11,34 @@ import (
 	"testing"
 )
 
-func TestAddWord_ZeroSynonyms(t *testing.T) {
-	g := graph.New()
-	req, _ := http.NewRequest(http.MethodPost, "/word", strings.NewReader(`{"word": "happy", "synonyms":[]}`))
-	rr := executeRequest(g, req)
-
-	if rr.Code != http.StatusCreated {
-		t.Fatalf("AddWord response status code expected %d, got %d", http.StatusCreated, rr.Code)
-	}
-	respBody, err := data.DecodeJson[data.WordInfo](rr.Body)
-	if err != nil {
-		t.Fatalf("error decoding response body: %s", err)
-	}
-	if respBody.Word != "happy" {
-		t.Fatalf("respBody.Word expected 'happy', got %s", respBody)
-	}
-	if len(respBody.Synonyms) != 0 {
-		t.Fatalf("respBody.Synonyms length expected 0, got %d", len(respBody.Synonyms))
-	}
-}
-
-func TestAddWord_OneSynonym(t *testing.T) {
-	g := graph.New()
-	req, _ := http.NewRequest(http.MethodPost, "/word", strings.NewReader(`{"word": "happy", "synonyms":["glad"]}`))
-	rr := executeRequest(g, req)
-
-	if rr.Code != http.StatusCreated {
-		t.Fatalf("AddWord response status code expected %d, got %d", http.StatusCreated, rr.Code)
-	}
-	respBody, err := data.DecodeJson[data.WordInfo](rr.Body)
-	if err != nil {
-		t.Fatalf("error decoding response body: %s", err)
-	}
-	if respBody.Word != "happy" {
-		t.Fatalf("respBody.Word expected 'happy', got %s", respBody)
-	}
-	if len(respBody.Synonyms) != 1 {
-		t.Fatalf("respBody.Synonyms length expected 0, got %d", len(respBody.Synonyms))
-	}
-	if respBody.Synonyms[0] != "glad" {
-		t.Fatalf("respBody.Synonyms[0] expected 'glad', got %s", respBody.Synonyms[0])
-	}
-}
-
-func TestAddWord_NilSynonyms(t *testing.T) {
+func TestAddWord(t *testing.T) {
 	g := graph.New()
 	req, _ := http.NewRequest(http.MethodPost, "/word", strings.NewReader(`{"word": "happy"}`))
 	rr := executeRequest(g, req)
 
-	if rr.Code != http.StatusBadRequest {
-		t.Fatalf("AddWord response status code expected %d, got %d", http.StatusBadRequest, rr.Code)
+	if rr.Code != http.StatusCreated {
+		t.Fatalf("AddWord response status code expected %d, got %d", http.StatusCreated, rr.Code)
+	}
+	respBody, err := data.DecodeJson[data.Word](rr.Body)
+	if err != nil {
+		t.Fatalf("error decoding response body: %s", err)
+	}
+	if respBody.Word != "happy" {
+		t.Fatalf("respBody.Word expected 'happy', got %s", respBody)
 	}
 }
 
-func TestAddSynonyms(t *testing.T) {
+func TestAddSynonym(t *testing.T) {
 	g := graph.New()
 	err := g.AddVertex("happy")
 	if err != nil {
 		t.Fatalf("error adding vertex: %s", err)
 	}
-	req, _ := http.NewRequest(http.MethodPost, "/synonyms/happy", strings.NewReader(`{"synonyms": ["glad"]}`))
+	req, _ := http.NewRequest(http.MethodPost, "/synonym/happy", strings.NewReader(`{"synonym": "glad"}`))
 	rr := executeRequest(g, req)
 
 	if rr.Code != http.StatusCreated {
-		t.Fatalf("AddSynonyms response status code expected %d, got %d", http.StatusCreated, rr.Code)
+		t.Fatalf("AddSynonym response status code expected %d, got %d", http.StatusCreated, rr.Code)
 	}
 }
 
@@ -84,11 +48,11 @@ func TestAddSynonyms_MalformedRequest(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error adding vertex: %s", err)
 	}
-	req, _ := http.NewRequest(http.MethodPost, "/synonyms/happy", strings.NewReader(`{}`))
+	req, _ := http.NewRequest(http.MethodPost, "/synonym/happy", strings.NewReader(`{}`))
 	rr := executeRequest(g, req)
 
 	if rr.Code != http.StatusBadRequest {
-		t.Fatalf("AddSynonyms response status code expected %d, got %d", http.StatusBadRequest, rr.Code)
+		t.Fatalf("AddSynonym response status code expected %d, got %d", http.StatusBadRequest, rr.Code)
 	}
 }
 
@@ -104,7 +68,7 @@ func TestGetSynonyms_ZeroSynonyms(t *testing.T) {
 	if rr.Code != http.StatusOK {
 		t.Fatalf("GetSynonyms response status code expected %d, got %d", http.StatusOK, rr.Code)
 	}
-	respBody, err := data.DecodeJson[data.SynonymsInfo](rr.Body)
+	respBody, err := data.DecodeJson[data.Synonyms](rr.Body)
 	if err != nil {
 		t.Fatalf("error decoding response body: %s", err)
 	}
@@ -129,7 +93,7 @@ func TestGetSynonyms(t *testing.T) {
 	if rr.Code != http.StatusOK {
 		t.Fatalf("GetSynonyms response status code expected %d, got %d", http.StatusOK, rr.Code)
 	}
-	respBody, err := data.DecodeJson[data.SynonymsInfo](rr.Body)
+	respBody, err := data.DecodeJson[data.Synonyms](rr.Body)
 	if err != nil {
 		t.Fatalf("error decoding response body: %s", err)
 	}
@@ -138,47 +102,6 @@ func TestGetSynonyms(t *testing.T) {
 	}
 	if respBody.Synonyms[0] != "glad" {
 		t.Fatalf("respBody.Synonyms[0] expected 'glad', got '%s'", respBody.Synonyms[0])
-	}
-}
-
-func TestGetWords_ZeroWords(t *testing.T) {
-	g := graph.New()
-	req, _ := http.NewRequest(http.MethodGet, "/words", nil)
-	rr := executeRequest(g, req)
-
-	if rr.Code != http.StatusOK {
-		t.Fatalf("GetWords response status code expected %d, got %d", http.StatusOK, rr.Code)
-	}
-	respBody, err := data.DecodeJson[data.WordsInfo](rr.Body)
-	if err != nil {
-		t.Fatalf("error decoding response body: %s", err)
-	}
-	if len(respBody.Words) != 0 {
-		t.Fatalf("respBody.Words length expected 0, got %d", len(respBody.Words))
-	}
-}
-
-func TestGetWords(t *testing.T) {
-	g := graph.New()
-	err := g.AddVertex("happy")
-	if err != nil {
-		t.Fatalf("error adding vertex: %s", err)
-	}
-	req, _ := http.NewRequest(http.MethodGet, "/words", nil)
-	rr := executeRequest(g, req)
-
-	if rr.Code != http.StatusOK {
-		t.Fatalf("GetWords response status code expected %d, got %d", http.StatusOK, rr.Code)
-	}
-	respBody, err := data.DecodeJson[data.WordsInfo](rr.Body)
-	if err != nil {
-		t.Fatalf("error decoding response body: %s", err)
-	}
-	if len(respBody.Words) != 1 {
-		t.Fatalf("respBody.Words length expected 0, got %d", len(respBody.Words))
-	}
-	if respBody.Words[0] != "happy" {
-		t.Fatalf("respBody.Words[0] expected 'happy', got '%s'", respBody.Words[0])
 	}
 }
 

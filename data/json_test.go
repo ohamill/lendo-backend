@@ -16,12 +16,12 @@ func TestDecodeJson_WordInfo(t *testing.T) {
 		}`,
 	)
 
-	wordInfo, err := DecodeJson[WordInfo](r)
+	wordInfo, err := DecodeJson[CompleteWordInfo](r)
 	if err != nil {
 		t.Fatalf("error decoding wordInfo: %v\n", err)
 	}
 
-	if wordInfo.Word != "happy" {
+	if wordInfo.Word.Word != "happy" {
 		t.Fatalf("wordInfo.Word expected 'happy', got '%v'\n", wordInfo.Word)
 	}
 	if len(wordInfo.Synonyms) != 2 {
@@ -45,18 +45,18 @@ func TestDecodeJson_SynonymsInfo(t *testing.T) {
 		}`,
 	)
 
-	synonymsInfo, err := DecodeJson[SynonymsInfo](f)
+	synonyms, err := DecodeJson[Synonyms](f)
 	if err != nil {
 		t.Fatalf("error decoding synonymsInfo: %v\n", err)
 	}
 
-	if len(synonymsInfo.Synonyms) != 2 {
-		t.Fatalf("synonymsInfo.Synonyms length expected 2, got %v\n", len(synonymsInfo.Synonyms))
+	if len(synonyms.Synonyms) != 2 {
+		t.Fatalf("synonymsInfo.Synonyms length expected 2, got %v\n", len(synonyms.Synonyms))
 	}
-	if synonymsInfo.Synonyms[0] != "glad" {
-		t.Fatalf("wordInfo.Synonyms[0] expected 'glad', got '%v'\n", synonymsInfo.Synonyms[0])
+	if synonyms.Synonyms[0] != "glad" {
+		t.Fatalf("wordInfo.Synonyms[0] expected 'glad', got '%v'\n", synonyms.Synonyms[0])
 	}
-	if synonymsInfo.Synonyms[1] != "joyful" {
-		t.Fatalf("wordInfo.Synonyms[1] expected 'joyful', got '%v'\n", synonymsInfo.Synonyms[1])
+	if synonyms.Synonyms[1] != "joyful" {
+		t.Fatalf("wordInfo.Synonyms[1] expected 'joyful', got '%v'\n", synonyms.Synonyms[1])
 	}
 }
