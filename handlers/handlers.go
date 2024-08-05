@@ -13,7 +13,7 @@ type Handlers struct {
 	Store *graph.Graph
 }
 
-// AddWord adds a new word to the graph. The request may optionally include the word's synonyms - if so, they are also added to the graph.
+// AddWord adds a new word to the graph
 func (h *Handlers) AddWord(c *gin.Context) {
 	request, err := data.DecodeJson[data.Word](c.Request.Body)
 	if err != nil {
@@ -30,7 +30,7 @@ func (h *Handlers) AddWord(c *gin.Context) {
 	c.JSON(http.StatusCreated, request)
 }
 
-// AddSynonym appends one or more synonyms to an existing word
+// AddSynonym appends one synonym to an existing word
 func (h *Handlers) AddSynonym(c *gin.Context) {
 	word := c.Param("word")
 	if word == "" {

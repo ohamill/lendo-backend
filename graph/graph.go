@@ -2,9 +2,7 @@
 package graph
 
 import (
-	"fmt"
 	"lendo-backend/lendoErrors"
-	"strings"
 )
 
 type Graph struct {
@@ -25,7 +23,6 @@ func (g *Graph) AddVertex(vertex string) error {
 	}
 
 	g.Edges[vertex] = make([]string, 0)
-	g.print()
 	return nil
 }
 
@@ -45,7 +42,6 @@ func (g *Graph) AddEdge(vertex, edge string) error {
 	g.Edges[edge] = append(g.Edges[edge], vertex)
 
 	g.Edges[vertex] = append(g.Edges[vertex], edge)
-	g.print()
 	return nil
 }
 
@@ -58,26 +54,7 @@ func (g *Graph) GetVertexEdges(vertex string) ([]string, error) {
 	return edges, nil
 }
 
-// GetVertexes returns all vertices contained in the graph
-func (g *Graph) GetVertexes() []string {
-	vertexes := make([]string, len(g.Edges))
-
-	i := 0
-	for vertex := range g.Edges {
-		vertexes[i] = vertex
-		i++
-	}
-
-	return vertexes
-}
-
 func (g *Graph) exists(vertex string) bool {
 	_, ok := g.Edges[vertex]
 	return ok
-}
-
-func (g *Graph) print() {
-	for vertex, edges := range g.Edges {
-		fmt.Printf("%s: %s\n", vertex, strings.Join(edges, " -> "))
-	}
 }
