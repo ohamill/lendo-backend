@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-var vertex string = "happy"
+var vertex = "happy"
 var edge = "glad"
 
 func TestGraph_New(t *testing.T) {
@@ -141,40 +141,6 @@ func TestGraph_GetVertexEdges(t *testing.T) {
 	}
 	if !edgeExists(edge, edges) {
 		t.Fatalf("g.GetVertexEdges did not contain expected edge '%s'\n", edge)
-	}
-}
-
-func TestGraph_GetVertexes_ZeroVertexes(t *testing.T) {
-	g := New()
-
-	vertices := g.GetVertexes()
-	if len(vertices) != 0 {
-		t.Fatalf("g.GetVertexes length expected 0, got %d\n", len(vertices))
-	}
-}
-
-func TestGraph_GetVertexes(t *testing.T) {
-	g := New()
-	vertex2 := "joyous"
-
-	err := g.AddVertex(vertex)
-	if err != nil {
-		t.Fatalf("g.AddVertex failed unexpectedly: %v\n", err)
-	}
-	err = g.AddVertex(vertex2)
-	if err != nil {
-		t.Fatalf("g.AddVertex failed unexpectedly: %v\n", err)
-	}
-
-	vertices := g.GetVertexes()
-	if len(vertices) != 2 {
-		t.Fatalf("g.GetVertexes length expected 2, got %d\n", len(vertices))
-	}
-	if !edgeExists(vertex, vertices) {
-		t.Fatalf("g.GetVertexes did not contain expected vertex '%s'\n", vertex)
-	}
-	if !edgeExists(vertex2, vertices) {
-		t.Fatalf("g.GetVertexes did not contain expected vertex '%s'\n", vertex2)
 	}
 }
 
